@@ -62,6 +62,14 @@ export default class MinecraftCommand extends Command {
             } else {
                 let serverStatus: StatusResponse;
                 const [host, port = 25565] = subcommands[0].split(':');
+                if (subcommands[0].length > 200) {
+                    message.channel.send(
+                        new MessageEmbed()
+                            .setColor('RED')
+                            .setTitle('Address is too long!')
+                            .setDescription('Server addresses must be no more than 200 characters in length')
+                    );
+                }
                 if (forbiddenAddresses.test(host)) {
                     message.channel.send(
                         new MessageEmbed()
