@@ -34,12 +34,6 @@ client.login(process.env.DiscordAPIToken).catch(err => {
     process.exit(1);
 });
 
-client.on('ready', () => {
-    if (!client.user) return;
-    console.log(`Logged in as ${client.user.tag}`);
-});
-
-
 process.once('SIGINT', async () => {
     console.log('Graceful shutdown...');
     client.destroy();
