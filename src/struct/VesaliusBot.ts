@@ -53,6 +53,7 @@ export class VesaliusBot extends AkairoClient {
             prefix: (message) => this.database.getPrefix(message.guild.id),
             commandUtil: true
         });
+
         this.inhibitorHandler = new InhibitorHandler(this, {
             // directory: './inhibitors/' Disabled to prevent errors when no files in directory
         });
@@ -67,6 +68,9 @@ export class VesaliusBot extends AkairoClient {
         this.commandHandler.loadAll();
         // this.inhibitorHandler.loadAll();
         this.listenerHandler.loadAll();
+
+        console.log(`Loaded ${this.commandHandler.modules.size} commands`);
+        console.log(`Loaded ${this.listenerHandler.modules.size} listeners`);
 
         this.listenerHandler.setEmitters({
             commandHandler: this.commandHandler,
