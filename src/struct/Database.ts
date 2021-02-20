@@ -68,12 +68,16 @@ export class DatabaseManager {
                 `);
 
             // Insert new cases here when updating version in package.json
-
+            default:
                 await this.query(`
                     UPDATE metadata
                     SET value=$2
                     WHERE key=$1;
                 `, ['DB_VERSION', currentVersion]);
+                if (this.metadata.get('DB_VERSION') !== currentVersion)
+                    console.log('Database updated to v' + currentVersion);
+                
+                this.metadata.set('DB_VERSION', currentVersion);
         }
 
         const guildsTable = tables.rows.find(row => row.tablename === 'guilds');
