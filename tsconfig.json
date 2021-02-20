@@ -6,7 +6,8 @@
         "module": "CommonJS",
         "moduleResolution": "Node",
         "alwaysStrict": true,
-        "esModuleInterop": true
+        "esModuleInterop": true,
+        "resolveJsonModule": true
     },
     "include": [
         "src/**/*"

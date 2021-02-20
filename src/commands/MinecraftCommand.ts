@@ -2,7 +2,9 @@ import { Command } from 'discord-akairo';
 import { Message, MessageEmbed } from 'discord.js';
 import { VesaliusBot } from '../struct/VesaliusBot';
 import { status as getStatus } from 'minecraft-server-util';
-import { StatusResponse } from 'minecraft-server-util/dist/model/StatusResponse';
+import { StatusResponse as OrigStatusResponse } from 'minecraft-server-util/dist/model/StatusResponse';
+
+export type StatusResponse = OrigStatusResponse & { date: number };
 
 const forbiddenAddresses: RegExp = /^(192\.(168|1(8|9))\.\d{1,3}\.\d{1,3})|(localhost)|(255\.255\.255\.255)|((10|127)\.\d{1,3}\.\d{1,3}\.\d{1,3})/i;
 
@@ -23,12 +25,12 @@ export default class MinecraftCommand extends Command {
         if (message.util?.parsed?.content) {
             const subcommands = message.util.parsed.content.split(' ');
             if (subcommands[0] === 'set' || subcommands[0] === 'default') {
-                if (subcommands[1].length > 256) {
+                if (subcommands[1].length > 200) {
                     message.channel.send(
                         new MessageEmbed()
                             .setColor('RED')
                             .setTitle('Address is too long!')
-                            .setDescription('Server addresses must be no more than 256 characters in length')
+                            .setDescription('Server addresses must be no more than 200 characters in length')
                     );
                 } else {
                     if (message.member.hasPermission('MANAGE_GUILD')) {
@@ -104,12 +106,18 @@ export default class MinecraftCommand extends Command {
         const cacheName = address + (port ? (':' + port.toString()) : '');
         if (this.cache[cacheName]) {
             if (this.cache[cacheName].lastCache < Date.now() - 300000) {
-                this.cache[cacheName].data = await getStatus(address, { port });
+                this.cache[cacheName].data = {
+                    ...await getStatus(address, { port }),
+                    date: Date.now()
+                };
                 this.cache[cacheName].lastCache = Date.now();
             }
         } else {
             this.cache[cacheName] = {
-                data: await getStatus(address, { port }),
+                data: {
+                    ...await getStatus(address, { port }),
+                    date: Date.now()
+                },
                 lastCache: Date.now()
             };
         }
@@ -136,7 +144,7 @@ export default class MinecraftCommand extends Command {
             .addField('Status', 'Online', true)
             .addField('Player Count', `${status.onlinePlayers}/${status.maxPlayers}`, true)
             .addField('Version', status.version, true)
-            .setTimestamp();
+            .setTimestamp(status.date);
         if (status.favicon) {
             embed.setThumbnail(`https://mc-api.net/v3/server/favicon/${address}`);
         }

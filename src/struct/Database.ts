@@ -18,6 +18,7 @@ export class DatabaseManager {
     public pool: Pool;
     public query: Pool['query'];
     public cache: DatabaseCache;
+    public metadata: Collection<string, string>;
 
     constructor(public client: VesaliusBot) {
         this.pool = new Pool(this.client.databaseOptions);
@@ -25,6 +26,7 @@ export class DatabaseManager {
         this.cache = {
             guilds: new Collection()
         };
+        this.metadata = new Collection();
     }
     
     async setup(): Promise<void> {
@@ -33,6 +35,47 @@ export class DatabaseManager {
             FROM pg_tables;
         `);
         tables.rows.forEach(row => this.cache[row] = []);
+        const metaTable = tables.rows.find(row => row.tablename === 'metadata');
+        if (!metaTable) {
+            console.log('Table \'metadata\' doesn\'t exist, creating...');
+            await this.query(`
+                CREATE TABLE IF NOT EXISTS metadata (
+                    key VARCHAR NOT NULL PRIMARY KEY,
+                    value VARCHAR NOT NULL
+                );
+            `);
+            await this.query(`
+                INSERT INTO metadata (key, value)
+                VALUES ($1, $2)
+            `, [ 'DB_VERSION', '0.0.1']);
+        }
+
+        const metaQuery = await this.query(`
+            SELECT * FROM metadata;
+        `);
+        metaQuery.rows.forEach(({ key, value }: { key: string; value: string }) => {
+            this.metadata.set(key, value);
+        });
+
+        const currentVersion: string = require('../../package.json').version;
+        // No break statements for future, if need to upgrade database by multiple versions
+        switch (this.metadata.get('DB_VERSION')) {
+            case '0.0.1':
+                console.log('Table \'guilds\' is outdated, updating...')
+                await this.query(`
+                    ALTER TABLE guilds
+                    ALTER COLUMN minecraftstatusaddress TYPE VARCHAR(200);
+                `);
+
+            // Insert new cases here when updating version in package.json
+
+                await this.query(`
+                    UPDATE metadata
+                    SET value=$2
+                    WHERE key=$1;
+                `, ['DB_VERSION', currentVersion]);
+        }
+
         const guildsTable = tables.rows.find(row => row.tablename === 'guilds');
         if (!guildsTable) {
             console.log('Table \'guilds\' doesn\'t exist, creating...');
@@ -44,14 +87,14 @@ export class DatabaseManager {
                     minecraftstatusaddress VARCHAR(256)
                 );
             `);
-        } else {
-            const guildsQuery = await this.query(`
-                SELECT * FROM guilds;
-            `);
-            guildsQuery.rows.forEach((row: GuildSchema) => {
-                this.cache.guilds.set(row.id, row);
-            });
         }
+        const guildsQuery = await this.query(`
+            SELECT * FROM guilds;
+        `);
+        guildsQuery.rows.forEach((row: GuildSchema) => {
+            this.cache.guilds.set(row.id, row);
+        });
+
         return;
     }
 
