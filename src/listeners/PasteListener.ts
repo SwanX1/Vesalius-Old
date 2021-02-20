@@ -1,6 +1,7 @@
-import axios, { AxiosError, AxiosRequestConfig } from 'axios';
+import axios, { AxiosError } from 'axios';
 import { Listener } from 'discord-akairo';
-import { CollectorFilter, Message, MessageEmbed, Util } from 'discord.js';
+import { Message, MessageEmbed, Util } from 'discord.js';
+import { VesaliusBot } from '../struct/VesaliusBot';
 
 export default class AutoPaste extends Listener {
     constructor() {
@@ -63,31 +64,26 @@ export default class AutoPaste extends Listener {
         }
 
         if (res.data.status === 'success') {
-            await Promise.all([
-                reply.edit(
-                    new MessageEmbed()
-                        .setColor(Util.resolveColor('GREEN'))
-                        .setTitle(attachment.name)
-                        .setURL(`https://paste.gg/${res.data.result.id}`)
-                        .setTimestamp(Date.parse(res.data.result.created_at))
-                ),
-                reply.react('🗑')
-            ]);
-            let filter: CollectorFilter;
-            filter = (reaction, user) => user.id === message.author.id && reaction.emoji.name === '🗑';
-            const ReactionCollector = reply.createReactionCollector(filter, { max: 1, time: 3600000, dispose: true });
-                    
-            ReactionCollector.on('collect', () => {
-                reply.delete({ reason: 'Author requested to delete the file.' });
+            const client = (this.client as VesaliusBot);
+            reply.edit(
+                new MessageEmbed()
+                    .setColor(Util.resolveColor('GREEN'))
+                    .setTitle(attachment.name)
+                    .setURL(`https://paste.gg/${res.data.result.id}`)
+                    .setTimestamp(Date.parse(res.data.result.created_at))
+            );
+            client.database.addPaste(res.data.result.id, res.data.result.deletion_key, message, reply).then(() => reply.react('🗑'));
+            
+            // Doesn't hurt to check if message
+            // was deleted during paste upload
+            if (message.deleted) {
                 axios.request({
                     url: `https://api.paste.gg/v1/pastes/${res.data.result.id}`,
                     method: 'DELETE',
                     headers: { Authorization: `Key ${res.data.result.deletion_key}` }
-                })
-                    .catch((err: AxiosError) => {
-                        console.log('err', err)
-                    });
-            });
+                }).catch(console.error.bind(console, 'Error while deleting paste:'));
+                reply.delete({ reason: 'Original message was deleted.' });
+            }
         } else {
             reply.edit(
                 new MessageEmbed()

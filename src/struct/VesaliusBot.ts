@@ -27,11 +27,13 @@ export class VesaliusBot extends AkairoClient {
         } else {
             ownerID = [process.env['owner']];
         }
-        super({
-            ownerID
-        }, {
-            disableMentions: 'everyone'
-        });
+        super(
+            { ownerID },
+            {
+                disableMentions: 'everyone',
+                partials: ['MESSAGE', 'REACTION']
+            }
+        );
 
         this.databaseOptions = databaseOptions;
       
