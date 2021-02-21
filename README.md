@@ -2,10 +2,10 @@
   Vesalius Discord Bot
 </h1>
 
-<h3>
+<h3 id="contents">
   • <a href="#overview">Overview</a><br>
+  • <a href="#setup">How to use</a><br>
   • <a href="#issuepr">Issue tutorial</a><br>
-  • <a href="#faq">FAQ</a><br>
   • <a href="#license">License</a><br>
 </h3>
 
@@ -15,7 +15,24 @@
 
 This repository contains the source code of the Vesalius bot.
 
-The bot runs on Node.JS (developed in v15, production is recommended for v14), Discord-Akairo, and in turn Discord.JS, as well as PostgreSQL.
+The bot runs on Node.JS (developed in v15, v14+ is required), Discord-Akairo, and in turn Discord.JS, as well as PostgreSQL.
+
+<hr>
+
+<h2 id="setup">Setup</h2>
+
+<h3>Prerequesites</h3>
+
+- PostgreSQL v13
+- NodeJS v14
+- Yarn (install using `npm i -g yarn`)
+- Git
+
+1. Clone this repository - `git clone https://github.com/SwanX1/Vesalius.git`
+2. Install dependencies - `yarn`
+3. Make a copy of `config.template.json` as `config.json`, and fill it out.
+4. Build the project - `yarn build`
+5. Run the bot - `node .`
 
 <hr>
 
@@ -27,6 +44,7 @@ The bot runs on Node.JS (developed in v15, production is recommended for v14), D
 3. Searching for duplicates of your issue.
 
 4. Posting your issue, titling your issue, and describing your issue.
+
 Your next step is to actually post your issue on the tracker with the "New issue" button.<br>
 Here are some things you should include in your description:
 - How you can reproduce bug (How you can make the bug happen/execute)<br>
