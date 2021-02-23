@@ -12,6 +12,7 @@ export default class AutoPaste extends Listener {
     }
     
     async exec(message: Message) {
+        if (message.author.bot) return;
         if (message.attachments.size < 1) return;
         const attachment = message.attachments.first();
         if (attachment.name.length > 225) {

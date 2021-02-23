@@ -13,6 +13,7 @@ export default class PasteAddReactionListener extends Listener {
     }
 
     async exec(reaction: MessageReaction, user: User) {
+        if (user.bot) return;
         const client = this.client as VesaliusBot;
         if (user.id === client.user.id) return;
         if (reaction.message.partial) await reaction.message.fetch();
