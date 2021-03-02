@@ -13,6 +13,7 @@ export default class PasteDeleteMessageListener extends Listener {
   }
 
   async exec(message: Message) {
+    if (!message.author) await message.author.fetch();
     if (message.author.bot) return;
     const client = this.client as VesaliusBot;
     let paste: PasteSchema | null;
