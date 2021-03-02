@@ -159,7 +159,7 @@ export default class MinecraftCommand extends Command {
         if (status.modInfo?.modList.length) {
             embed.addField(`Modded: ${status.modInfo.type}`, `${status.modInfo.modList.length} installed on server`)
         }
-        if (typeof status.samplePlayers !== 'undefined' && status.samplePlayers.length !== 0) {
+        if (status.samplePlayers && status.samplePlayers.length !== 0) {
             let players: Array<string> = [];
             for (let i = 0; i < status.samplePlayers.length; i++) {
                 if (i > 6) break;
