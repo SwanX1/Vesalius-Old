@@ -25,7 +25,7 @@ export default class PasteAddReactionListener extends Listener {
             reaction.users.remove(user);
             return;
         }
-        reaction.message.delete({ reason: 'Author requested to delete the file.' });
+        reaction.message.delete({ reason: (paste.userid !== user.id ? 'Moderator' : 'Author') + 'requested to delete the file.' });
         axios.request({
             url: `https://api.paste.gg/v1/pastes/${paste.id}`,
             method: 'DELETE',
