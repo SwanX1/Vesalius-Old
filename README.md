@@ -1,6 +1,13 @@
 <h1 align="center">
-  Vesalius Discord Bot
+  <strong>
+    This repository is now deprecated and archived.
+    Please visit <a href="//github.com/SwanX1/Vesalius">SwanX1/Vesalius</a> to view the new rewrite.
+  </strong>
 </h1>
+  
+<h2 align="center">
+  Vesalius Discord Bot
+</h2>
 
 <h3 id="contents">
   • <a href="#overview">Overview</a><br>
